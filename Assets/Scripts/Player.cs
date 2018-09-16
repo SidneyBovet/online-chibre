@@ -9,8 +9,9 @@ public class Player : NetworkBehaviour
 {
     [SerializeField] private GameObject cardBackPrefab;
 
+    public int playerId = -1;
+
     private GameManager gameManager;
-    private int playerId = -1;
     private Card[] cards;
     private HashSet<CardType> hand = new HashSet<CardType>();
     private bool canPlay = false;
@@ -155,7 +156,6 @@ public class Player : NetworkBehaviour
             foreach (Card c in cards)
                 c.transform.position = Vector3.zero;
             StartCoroutine(MoveCamera(transform.rotation.eulerAngles.y, 0.5f));
-            Debug.Log("Rotating scoreboard " + transform.rotation.eulerAngles.y + " degrees around axis");
             Scoreboard.instance.transform.RotateAround(Vector3.zero, Vector3.up, transform.rotation.eulerAngles.y);
         }
     }

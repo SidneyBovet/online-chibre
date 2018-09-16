@@ -75,7 +75,7 @@ public class GameManager : NetworkBehaviour
         {
             case GameState.WaitingForPlayers:
                 // wait for all players to connect
-                if (NetworkServer.connections.Count >= 1)
+                if (NetworkServer.connections.Count >= 4)
                 {
                     Debug.Log("Game starts");
                     cardsTeamOne.Clear();
