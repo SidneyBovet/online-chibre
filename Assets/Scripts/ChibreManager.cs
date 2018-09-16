@@ -53,18 +53,37 @@ public class ChibreManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Return true if lhs beats rhs when both are trump color
+    /// </summary>
+    public static bool CompareTrumpCards(CardRank lhs, CardRank rhs)
+    {
+        Debug.Assert(lhs != rhs);
+
+        if (lhs == CardRank.Jack)
+            return true;
+        else if (rhs == CardRank.Jack)
+            return false;
+        else if (lhs == CardRank.Nine)
+            return true;
+        else if (rhs == CardRank.Nine)
+            return false;
+        else
+            return lhs > rhs;
+    }
+
+    /// <summary>
     /// Computes which player won the trick
     /// </summary>
     /// <param name="trickCards">The card of this trick, played in order (player one played card [0], etc.</param>
     /// <returns></returns>
-    public int OnTrickEnd(CardColor trump, CardColor trickColor, CardType[] trickCards)
+    public static int GetTrickWinner(CardColor trump, CardColor trickColor, CardType[] trickCards)
     {
         Debug.Assert(trickCards.Length == 4);
-        
+
         // find best card
         CardType bestCard = trickCards[0];
         int bestPlayer = 0;
-        for (int i = 0; i < trickCards.Length; i++)
+        for (int i = 1; i < trickCards.Length; i++)
         {
             var card = trickCards[i];
             if (card.color == trump)
@@ -117,24 +136,5 @@ public class ChibreManager : MonoBehaviour
         }
 
         return score;
-    }
-
-    /// <summary>
-    /// Return true if lhs beats rhs when both are trump color
-    /// </summary>
-    private bool CompareTrumpCards(CardRank lhs, CardRank rhs)
-    {
-        Debug.Assert(lhs != rhs);
-
-        if (lhs == CardRank.Jack)
-            return true;
-        else if (rhs == CardRank.Jack)
-            return false;
-        else if (lhs == CardRank.Nine)
-            return true;
-        else if (rhs == CardRank.Nine)
-            return false;
-        else
-            return lhs > rhs;
     }
 }

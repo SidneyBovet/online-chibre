@@ -14,6 +14,7 @@ public class Player : NetworkBehaviour
     private Card[] cards;
     private HashSet<CardType> hand = new HashSet<CardType>();
     private bool canPlay = false;
+    private CardType[] currentTrick;
     private CardColor trump;
     private CardColor? trickColor = null;
     private Card movingCard;
@@ -27,6 +28,24 @@ public class Player : NetworkBehaviour
     {
         playerId = id;
         Scoreboard.instance.isTeamOne = (id % 2) == 0;
+    }
+
+    [ClientRpc]
+    public void RpcUpdateScores(int teamOne, int teamTwo)
+    {
+        Scoreboard.instance.UpdateScores(teamOne, teamTwo);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateExtraLineOne(string line)
+    {
+        Scoreboard.instance.UpdateExtraLines(line, null);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateExtraLineTwo(string line)
+    {
+        Scoreboard.instance.UpdateExtraLines(null, line);
     }
 
     [TargetRpc]
@@ -65,6 +84,12 @@ public class Player : NetworkBehaviour
     public void RpcResetTrickColor()
     {
         this.trickColor = null;
+    }
+
+    [ClientRpc]
+    public void RpcSetPlayedCards(CardType[] cardsPlayed)
+    {
+        currentTrick = cardsPlayed;
     }
 
     [ClientRpc]
@@ -107,6 +132,7 @@ public class Player : NetworkBehaviour
             gameObject.SetActive(false);
             var netTransformChild = gameObject.AddComponent<NetworkTransformChild>();
             netTransformChild.target = c.transform;
+            netTransformChild.sendInterval = 0.01f;
             gameObject.SetActive(true);
         }
     }
@@ -128,7 +154,9 @@ public class Player : NetworkBehaviour
             cam = Camera.main;
             foreach (Card c in cards)
                 c.transform.position = Vector3.zero;
-            cam.transform.RotateAround(Vector3.zero, Vector3.up, transform.rotation.eulerAngles.y);
+            StartCoroutine(MoveCamera(transform.rotation.eulerAngles.y, 0.5f));
+            Debug.Log("Rotating scoreboard " + transform.rotation.eulerAngles.y + " degrees around axis");
+            Scoreboard.instance.transform.RotateAround(Vector3.zero, Vector3.up, transform.rotation.eulerAngles.y);
         }
     }
 
@@ -138,6 +166,17 @@ public class Player : NetworkBehaviour
 
         RepositionCards();
         HandleMouseEvents();
+    }
+
+    private IEnumerator MoveCamera(float angle, float seconds)
+    {
+        angle = Mathf.Abs(angle) < Mathf.Abs(angle - 360f) ? angle : angle - 360f;
+        int steps = 100;
+        for (int i = 0; i < steps; i++)
+        {
+            cam.transform.RotateAround(Vector3.zero, Vector3.up, angle / steps);
+            yield return new WaitForSeconds(seconds / steps);
+        }
     }
 
     private void HandleMouseEvents()
@@ -152,7 +191,7 @@ public class Player : NetworkBehaviour
             {
                 if (movingCard != null
                     && movingCard.cardState == Card.CardState.HoveringDropZone
-                    && CanDropCard(movingCard.cardType))
+                    && CanPlayCard(movingCard.cardType))
                 {
                     movingCard.cardState = Card.CardState.Played;
                     movingCard.transform.Translate(movingCard.transform.InverseTransformVector(-cardDropTranslation));
@@ -197,7 +236,7 @@ public class Player : NetworkBehaviour
         }
     }
 
-    private bool CanDropCard(CardType intendedCard)
+    public bool CanPlayCard(CardType intendedCard)
     {
         if (trickColor == null) // no color defined yet
         {
@@ -207,8 +246,19 @@ public class Player : NetworkBehaviour
         {
             return true;
         }
+        else if (intendedCard.color == trump) // check if some trump were already played, in which case the card must be stronger
+        {
+            foreach (var card in currentTrick)
+            {
+                if (card.color == trump
+                    && ChibreManager.CompareTrumpCards(card.rank, intendedCard.rank))
+                    return false;
+            }
+            return true;
+        }
         else // not allowed if hand contains a card from current trick that's not the Jack of trump
         {
+            // TODO: this is a potential security hole, as we trust the client is giving us the right hand
             foreach (var card in hand)
             {
                 if (card.color == trickColor

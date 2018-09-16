@@ -14,12 +14,16 @@ public class GameManager : NetworkBehaviour
         Deal,
         ChooseTrump,
         OngoingTrick,
-        ComputeResults
+        ComputeResults,
+        Ended
     }
 
     private List<CardType> allCards;
+    private int maxScore = 1000;
     private int tricksCount = 0;
     private int cardsDroppedCount = 0;
+    private int firstPlayer = 0;
+    private int trumpChoser = 0;
     private CardColor trickColor;
     private CardType[] currentTrick = new CardType[4]; // player one populates currentTrick[0], etc.
     private List<CardType> cardsTeamOne, cardsTeamTwo;
@@ -42,7 +46,8 @@ public class GameManager : NetworkBehaviour
         }
         cardsDroppedCount++;
         t0 = Time.time;
-        UpdatePlayerAuthorization(cardsDroppedCount);
+        UpdatePlayerCardsPlayed();
+        UpdatePlayerAuthorization((firstPlayer + cardsDroppedCount) % 4);
     }
 
     private void Awake()
@@ -70,7 +75,7 @@ public class GameManager : NetworkBehaviour
         {
             case GameState.WaitingForPlayers:
                 // wait for all players to connect
-                if (NetworkServer.connections.Count > 0)
+                if (NetworkServer.connections.Count >= 1)
                 {
                     Debug.Log("Game starts");
                     cardsTeamOne.Clear();
@@ -84,10 +89,8 @@ public class GameManager : NetworkBehaviour
                 if (Time.time - t0 > 1f)
                 {
                     Debug.Log("Discovering players");
-                    Scoreboard.instance.RpcUpdateScores(
-                        ChibreManager.instance.scoreTeamOne,
-                        ChibreManager.instance.scoreTeamTwo);
                     DiscoverPlayers();
+                    UpdateScores();
                     gameState = GameState.Deal;
                 }
                 break;
@@ -95,13 +98,15 @@ public class GameManager : NetworkBehaviour
                 // give ourselves one second before discovering players and dealing
                 Debug.Log("Dealing cards");
                 DealCards();
-                UpdatePlayerAuthorization(0);
+                UpdatePlayerAuthorization(firstPlayer);
                 gameState = GameState.ChooseTrump;
                 break;
             case GameState.ChooseTrump:
                 // wait for team to choose trump
+                Debug.Log("Chosing trump");
                 trump = CardColor.Spades;
                 UpdatePlayerTrump(trump);
+                UpdateExtraLines("TRUMP IS " + trump.ToString(), "");
                 gameState = GameState.OngoingTrick;
                 break;
             case GameState.OngoingTrick:
@@ -110,38 +115,56 @@ public class GameManager : NetworkBehaviour
                     && Time.time - t0 > 1f)
                 {
                     Debug.Log("Trick ended, recording cards played");
-                    int winningPlayer = ChibreManager.instance.OnTrickEnd(trump, trickColor, currentTrick);
-                    if (winningPlayer % 2 == 0)
-                        cardsTeamOne.AddRange(currentTrick);
-                    else
-                        cardsTeamTwo.AddRange(currentTrick);
-
-                    cardsDroppedCount = 0;
-                    UpdatePlayerTrickColor(null);
-
-                    foreach (Player p in players)
-                        p.RpcClearPlayedCards();
-
-                    tricksCount++;
-
-                    if (tricksCount == 9)
-                    {
-                        Debug.Log("Match ended");
-                        gameState = GameState.ComputeResults;
-                    }
+                    HandleTrickEnd();
                 }
                 break;
             case GameState.ComputeResults:
                 // compute scores and deal again (maybe with timer)
                 Debug.Log("Computing results");
                 ChibreManager.instance.OnMatchEnd(trump, cardsTeamOne.ToArray(), cardsTeamTwo.ToArray());
-                Scoreboard.instance.RpcUpdateScores(
-                    ChibreManager.instance.scoreTeamOne,
-                    ChibreManager.instance.scoreTeamTwo);
+                UpdateScores();
+                if (ChibreManager.instance.scoreTeamOne < maxScore
+                    && ChibreManager.instance.scoreTeamTwo < maxScore)
+                    gameState = GameState.Deal;
+                else
+                    gameState = GameState.Ended;
+                break;
+            case GameState.Ended:
+                UpdateExtraLines("GAME ENDED,", "THANKS FOR PLAYING");
                 break;
             default:
                 Debug.LogError("Unknown game state: " + gameState);
                 break;
+        }
+    }
+
+    private void HandleTrickEnd()
+    {
+        int winningPlayer = ChibreManager.GetTrickWinner(trump, trickColor, currentTrick);
+        if (winningPlayer % 2 == 0)
+        {
+            Debug.Log("Team one wins this trick.");
+            cardsTeamOne.AddRange(currentTrick);
+        }
+        else
+        {
+            Debug.Log("Team two wins this trick.");
+            cardsTeamTwo.AddRange(currentTrick);
+        }
+
+        // set everything for the next trick
+        cardsDroppedCount = 0;
+        firstPlayer = winningPlayer;
+        UpdatePlayerTrickColor(null);
+        foreach (Player p in players)
+            p.RpcClearPlayedCards();
+        tricksCount++;
+
+        if (tricksCount == 9)
+        {
+            Debug.Log("Match ended");
+            trumpChoser = (trumpChoser + 1) % 4;
+            gameState = GameState.ComputeResults;
         }
     }
 
@@ -174,6 +197,10 @@ public class GameManager : NetworkBehaviour
             {
                 if (i % 4 == player)
                     playerCards.Add(allCards[i]);
+
+                if (allCards[i].color == CardColor.Diamonds
+                    && allCards[i].rank == CardRank.Seven)
+                    trumpChoser = player;
             }
 
             if (player < players.Length)
@@ -213,5 +240,36 @@ public class GameManager : NetworkBehaviour
     {
         foreach (var player in players)
             player.RpcSetTrump(trump);
+    }
+
+    private void UpdatePlayerCardsPlayed()
+    {
+        // extract already played cards from list
+        var playedCards = new CardType[cardsDroppedCount];
+        for (int i = 0; i < cardsDroppedCount; i++)
+            playedCards[i] = currentTrick[(firstPlayer + i) % currentTrick.Length];
+
+        // send them
+        foreach (var player in players)
+            player.RpcSetPlayedCards(playedCards);
+    }
+
+    private void UpdateScores()
+    {
+        foreach (var player in players)
+            player.RpcUpdateScores(
+                ChibreManager.instance.scoreTeamOne,
+                ChibreManager.instance.scoreTeamTwo);
+    }
+
+    private void UpdateExtraLines(string lineOne, string lineTwo)
+    {
+        foreach (var player in players)
+        {
+            if (lineOne != null)
+                player.RpcUpdateExtraLineOne(lineOne);
+            if (lineTwo != null)
+                player.RpcUpdateExtraLineTwo(lineTwo);
+        }
     }
 }

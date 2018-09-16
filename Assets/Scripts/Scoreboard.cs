@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class Scoreboard : NetworkBehaviour
+public class Scoreboard : MonoBehaviour
 {
     public static Scoreboard instance;
     public bool isTeamOne = true;
@@ -24,11 +23,8 @@ public class Scoreboard : NetworkBehaviour
             instance = this;
     }
 
-    [ClientRpc]
-    public void RpcUpdateScores(int teamOne, int teamTwo)
+    public void UpdateScores(int teamOne, int teamTwo)
     {
-        Debug.LogFormat("Updating scores: {0} - {1}", teamOne, teamTwo);
-        
         if (isTeamOne)
         {
             scoreTeamOne.text = teamOne.ToString();
@@ -41,8 +37,7 @@ public class Scoreboard : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void RpcUpdateExtraLines(string lineOne, string lineTwo)
+    public void UpdateExtraLines(string lineOne, string lineTwo)
     {
         if (lineOne != null) extraLineOne.text = lineOne.ToUpper();
         if (lineTwo != null) extraLineTwo.text = lineTwo.ToUpper();
