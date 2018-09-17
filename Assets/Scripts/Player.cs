@@ -139,6 +139,7 @@ public class Player : NetworkBehaviour
             var netTransformChild = gameObject.AddComponent<NetworkTransformChild>();
             netTransformChild.target = c.transform;
             netTransformChild.sendInterval = 0.01f;
+            netTransformChild.movementThreshold = 0.001f;
             gameObject.SetActive(true);
         }
     }
