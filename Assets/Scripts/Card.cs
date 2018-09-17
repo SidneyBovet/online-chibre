@@ -6,8 +6,9 @@ namespace Cards
 {
     public enum CardColor
     {
-        Clubs,
+        // Note: upon swapping these the player prefab must be changed, as enums are stored as int in prefabs.
         Diamonds,
+        Clubs,
         Hearts,
         Spades
     }

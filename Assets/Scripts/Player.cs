@@ -13,7 +13,7 @@ public class Player : NetworkBehaviour
 
     private GameManager gameManager;
     private Card[] cards;
-    private HashSet<CardType> hand = new HashSet<CardType>();
+    public List<CardType> hand = new List<CardType>();
     private bool canPlay = false;
     private CardType[] currentTrick;
     private CardColor trump;
@@ -58,6 +58,11 @@ public class Player : NetworkBehaviour
         hand.Clear();
         foreach (CardType c in dealtCards)
             hand.Add(c);
+
+        // sort hand
+        hand.Sort(new ChibreManager.CardComparer());
+
+        // set cards as in hand
         foreach (Card c in cards)
             if (hand.Contains(c.cardType))
                 c.cardState = Card.CardState.InHand;
@@ -283,19 +288,13 @@ public class Player : NetworkBehaviour
         // place cards in front of player
         float cardSpacing = 0.1f;
         float totalWidth = (hand.Count - 1) * cardSpacing;
-        int cardsPlaced = 0;
         foreach (Card c in cards)
         {
-            if (c == movingCard)
+            if (hand.Contains(c.cardType)
+                && c != movingCard)
             {
-                cardsPlaced++;
-                continue;
-            }
-            else if (hand.Contains(c.cardType))
-            {
-                var posX = -(totalWidth / 2f) + cardsPlaced * cardSpacing;
+                var posX = -(totalWidth / 2f) + hand.IndexOf(c.cardType) * cardSpacing;
                 c.transform.localPosition = new Vector3(posX, 0f, 0f);
-                cardsPlaced++;
             }
         }
     }

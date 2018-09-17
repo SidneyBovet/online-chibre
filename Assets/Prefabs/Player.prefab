@@ -3805,7 +3805,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 6
 --- !u!114 &114060766680629770
 MonoBehaviour:
@@ -3833,7 +3833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 1
 --- !u!114 &114076618033701044
 MonoBehaviour:
@@ -3861,7 +3861,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 2
 --- !u!114 &114161092093123836
 MonoBehaviour:
@@ -3875,7 +3875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 5
 --- !u!114 &114161261569465390
 MonoBehaviour:
@@ -3889,7 +3889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 4
 --- !u!114 &114259386771813486
 MonoBehaviour:
@@ -3959,7 +3959,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 0
 --- !u!114 &114321462143381764
 MonoBehaviour:
@@ -4001,7 +4001,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 0
 --- !u!114 &114444534944293952
 MonoBehaviour:
@@ -4043,7 +4043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 7
 --- !u!114 &114483583895499734
 MonoBehaviour:
@@ -4057,7 +4057,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 1
 --- !u!114 &114521335274977688
 MonoBehaviour:
@@ -4071,7 +4071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 5
 --- !u!114 &114532892496260348
 MonoBehaviour:
@@ -4085,7 +4085,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 7
 --- !u!114 &114619367588607398
 MonoBehaviour:
@@ -4099,7 +4099,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 4
 --- !u!114 &114648376951459544
 MonoBehaviour:
@@ -4113,7 +4113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 3
 --- !u!114 &114648490372675000
 MonoBehaviour:
@@ -4141,7 +4141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 3
 --- !u!114 &114676548321825704
 MonoBehaviour:
@@ -4197,7 +4197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 8
 --- !u!114 &114759480669692284
 MonoBehaviour:
@@ -4225,7 +4225,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 2
 --- !u!114 &114798587272038506
 MonoBehaviour:
@@ -4260,6 +4260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardBackPrefab: {fileID: 100000, guid: bc1d1a549b7abd745ae0856f1eb478c8, type: 3}
+  playerId: -1
 --- !u!114 &114846339181175918
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4318,7 +4319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 0
+  cardColor: 1
   cardRank: 6
 --- !u!114 &114933744682679744
 MonoBehaviour:
@@ -4332,7 +4333,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardState: 0
-  cardColor: 1
+  cardColor: 0
   cardRank: 8
 --- !u!114 &114971811233979356
 MonoBehaviour:

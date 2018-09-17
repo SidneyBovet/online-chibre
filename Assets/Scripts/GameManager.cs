@@ -168,6 +168,7 @@ public class GameManager : NetworkBehaviour
         // set everything for the next trick
         cardsDroppedCount = 0;
         firstPlayer = winningPlayer;
+        UpdatePlayerAuthorization(firstPlayer);
         UpdatePlayerTrickColor(null);
         foreach (Player p in players)
             p.RpcClearPlayedCards();
@@ -217,8 +218,6 @@ public class GameManager : NetworkBehaviour
 
     private void UpdatePlayerAuthorization(int playingClient)
     {
-        // debug:
-        playingClient %= players.Length;
         //Debug.Log("Player " + playingClient + " may play now");
 
         // set authorization for all clients

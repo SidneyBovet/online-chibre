@@ -137,4 +137,12 @@ public class ChibreManager : MonoBehaviour
 
         return score;
     }
+
+    public class CardComparer : IComparer<CardType>
+    {
+        public int Compare(CardType a, CardType b)
+        {
+            return 10 * ((int)a.color - (int)b.color) + ((int)a.rank - (int)b.rank);
+        }
+    }
 }
