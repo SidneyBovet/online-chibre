@@ -144,6 +144,7 @@ public class GameManager : NetworkBehaviour
         ChibreManager.instance.OnMatchEnd(trump, cardsTeamOne.ToArray(), cardsTeamTwo.ToArray());
         UpdateScores();
         cardsDroppedCount = 0;
+        tricksCount = 0;
         cardsTeamOne.Clear();
         cardsTeamTwo.Clear();
         if (ChibreManager.instance.scoreTeamOne > maxScore
@@ -179,7 +180,7 @@ public class GameManager : NetworkBehaviour
             p.RpcClearPlayedCards();
         tricksCount++;
 
-        if (tricksCount == 9)
+        if (tricksCount == (int)(allCards.Count / (float)PLAYER_CONT))
         {
             trumpChoser = (trumpChoser + 1) % players.Length;
             gameState = GameState.MatchEnded;
