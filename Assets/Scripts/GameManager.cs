@@ -10,11 +10,10 @@ public class GameManager : NetworkBehaviour
     private enum GameState
     {
         WaitingForPlayers,
-        DiscoverPlayers,
         Deal,
         ChooseTrump,
         OngoingTrick,
-        ComputeResults,
+        MatchEnded,
         Ended
     }
 
@@ -29,9 +28,9 @@ public class GameManager : NetworkBehaviour
     private List<CardType> cardsTeamOne, cardsTeamTwo;
     private CardColor trump;
 
-    private Player[] players;
+    private Player[] players = new Player[1];
     private GameState gameState = GameState.WaitingForPlayers;
-    private float t0;
+    private float timer;
 
     /// <summary>
     /// playerId is zero-indexed!
@@ -45,9 +44,12 @@ public class GameManager : NetworkBehaviour
             UpdatePlayerTrickColor(trickColor);
         }
         cardsDroppedCount++;
-        t0 = Time.time;
+        timer = Time.time + 1f;
         UpdatePlayerCardsPlayed();
-        UpdatePlayerAuthorization((firstPlayer + cardsDroppedCount) % 4);
+        if (cardsDroppedCount < players.Length)
+            UpdatePlayerAuthorization((firstPlayer + cardsDroppedCount) % players.Length);
+        else
+            UpdatePlayerAuthorization(-1);
     }
 
     private void Awake()
@@ -75,59 +77,45 @@ public class GameManager : NetworkBehaviour
         {
             case GameState.WaitingForPlayers:
                 // wait for all players to connect
-                if (NetworkServer.connections.Count >= 4)
+                if (NetworkServer.connections.Count >= players.Length)
                 {
                     Debug.Log("Game starts");
                     cardsTeamOne.Clear();
                     cardsTeamTwo.Clear();
                     tricksCount = 0;
-                    t0 = Time.time;
-                    gameState = GameState.DiscoverPlayers;
-                }
-                break;
-            case GameState.DiscoverPlayers:
-                if (Time.time - t0 > 1f)
-                {
-                    Debug.Log("Discovering players");
-                    DiscoverPlayers();
-                    UpdateScores();
+                    timer = Time.time + 1f;
                     gameState = GameState.Deal;
                 }
                 break;
             case GameState.Deal:
-                // give ourselves one second before discovering players and dealing
-                Debug.Log("Dealing cards");
-                DealCards();
-                UpdatePlayerAuthorization(firstPlayer);
-                gameState = GameState.ChooseTrump;
+                // give ourselves one second before dealing
+                if (Time.time - timer > 0f)
+                {
+                    Debug.Log("Dealing cards");
+                    UpdateScores();
+                    DealCards();
+                    UpdatePlayerAuthorization(firstPlayer);
+                    gameState = GameState.ChooseTrump;
+                }
                 break;
             case GameState.ChooseTrump:
                 // wait for team to choose trump
                 Debug.Log("Chosing trump");
-                trump = CardColor.Spades;
-                UpdatePlayerTrump(trump);
-                UpdateExtraLines("TRUMP IS " + trump.ToString(), "");
-                gameState = GameState.OngoingTrick;
+                HandleTrumpChoice();
                 break;
             case GameState.OngoingTrick:
                 // detect end of trick and proceed
-                if (cardsDroppedCount == 4
-                    && Time.time - t0 > 1f)
+                if (cardsDroppedCount == players.Length
+                    && Time.time - timer > 0f)
                 {
                     Debug.Log("Trick ended, recording cards played");
                     HandleTrickEnd();
                 }
                 break;
-            case GameState.ComputeResults:
-                // compute scores and deal again (maybe with timer)
-                Debug.Log("Computing results");
-                ChibreManager.instance.OnMatchEnd(trump, cardsTeamOne.ToArray(), cardsTeamTwo.ToArray());
-                UpdateScores();
-                if (ChibreManager.instance.scoreTeamOne < maxScore
-                    && ChibreManager.instance.scoreTeamTwo < maxScore)
-                    gameState = GameState.Deal;
-                else
-                    gameState = GameState.Ended;
+            case GameState.MatchEnded:
+                // compute scores and deal again
+                Debug.Log("Match ended");
+                HandleMatchEnd();
                 break;
             case GameState.Ended:
                 UpdateExtraLines("GAME ENDED,", "THANKS FOR PLAYING");
@@ -135,6 +123,31 @@ public class GameManager : NetworkBehaviour
             default:
                 Debug.LogError("Unknown game state: " + gameState);
                 break;
+        }
+    }
+
+    private void HandleTrumpChoice()
+    {
+        trump = CardColor.Spades;
+        UpdatePlayerTrump(trump);
+        UpdateExtraLines("TRUMP IS " + trump.ToString(), "");
+        gameState = GameState.OngoingTrick;
+    }
+
+    private void HandleMatchEnd()
+    {
+        ChibreManager.instance.OnMatchEnd(trump, cardsTeamOne.ToArray(), cardsTeamTwo.ToArray());
+        UpdateScores();
+        cardsDroppedCount = 0;
+        cardsTeamOne.Clear();
+        cardsTeamTwo.Clear();
+        if (ChibreManager.instance.scoreTeamOne > maxScore
+            || ChibreManager.instance.scoreTeamTwo > maxScore)
+            gameState = GameState.Ended;
+        else
+        {
+            timer = Time.time + 1f;
+            gameState = GameState.Deal;
         }
     }
 
@@ -163,39 +176,26 @@ public class GameManager : NetworkBehaviour
         if (tricksCount == 9)
         {
             Debug.Log("Match ended");
-            trumpChoser = (trumpChoser + 1) % 4;
-            gameState = GameState.ComputeResults;
+            trumpChoser = (trumpChoser + 1) % players.Length;
+            gameState = GameState.MatchEnded;
         }
     }
 
-    private void DiscoverPlayers()
+    public void AddPlayer(Player player, int playerId)
     {
-        List<Player> playersFound = new List<Player>();
-        int playerId = 0;
-
-        foreach (var player in NetworkServer.objects.Values)
-        {
-            var playerComponent = player.GetComponent<Player>();
-            if (playerComponent != null)
-            {
-                playersFound.Add(playerComponent);
-                playerComponent.TargetSetPlayerId(playerComponent.connectionToClient, playerId);
-                playerId++;
-            }
-        }
-
-        players = playersFound.ToArray();
+        players[playerId] = player;
+        player.TargetSetPlayerId(player.connectionToClient, playerId);
     }
 
     private void DealCards()
     {
 
-        for (int player = 0; player < 4; player++)
+        for (int player = 0; player < players.Length; player++)
         {
             List<CardType> playerCards = new List<CardType>();
             for (int i = 0; i < allCards.Count; i++)
             {
-                if (i % 4 == player)
+                if (i % players.Length == player)
                     playerCards.Add(allCards[i]);
 
                 if (allCards[i].color == CardColor.Diamonds

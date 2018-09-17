@@ -7,6 +7,8 @@ public class ChibreNetworkManager : NetworkManager
 {
     [SerializeField]
     private Transform[] orderedSpawnLocations;
+    [SerializeField]
+    private GameManager gameManager;
 
     private int playerCount = 0;
 
@@ -15,6 +17,7 @@ public class ChibreNetworkManager : NetworkManager
         var spawnLocation = orderedSpawnLocations[playerCount];
         GameObject player = (GameObject)Instantiate(playerPrefab, spawnLocation.position, spawnLocation.rotation);
         NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
+        gameManager.AddPlayer(player.GetComponent<Player>(), playerCount);
         playerCount++;
     }
 }

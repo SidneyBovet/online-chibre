@@ -189,19 +189,25 @@ public class Player : NetworkBehaviour
             }
             else if (Input.GetMouseButtonUp(0))
             {
-                if (movingCard != null
-                    && movingCard.cardState == Card.CardState.HoveringDropZone
-                    && CanPlayCard(movingCard.cardType))
-                {
-                    movingCard.cardState = Card.CardState.Played;
-                    movingCard.transform.Translate(movingCard.transform.InverseTransformVector(-cardDropTranslation));
-                    hand.Remove(movingCard.cardType);
-                    CmdOnCardPlayed(movingCard.cardType, playerId);
-                    movingCard = null;
-                }
-                movingCard = null;
+                TryDropCard();
             }
         }
+    }
+
+    private void TryDropCard()
+    {
+        if (movingCard != null
+            && movingCard.cardState == Card.CardState.HoveringDropZone
+            && CanPlayCard(movingCard.cardType))
+        {
+            movingCard.cardState = Card.CardState.Played;
+            movingCard.transform.Translate(movingCard.transform.InverseTransformVector(-cardDropTranslation));
+            hand.Remove(movingCard.cardType);
+            CmdOnCardPlayed(movingCard.cardType, playerId);
+            canPlay = false;
+            movingCard = null;
+        }
+        movingCard = null;
     }
 
     private void MoveCards(Vector2 mousePos)
