@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -17,6 +18,9 @@ public class GameManager : NetworkBehaviour
         Ended
     }
 
+    private const int PLAYER_CONT = 2;
+
+    private Player[] players = new Player[PLAYER_CONT];
     private List<CardType> allCards;
     private int maxScore = 1000;
     private int tricksCount = 0;
@@ -24,11 +28,9 @@ public class GameManager : NetworkBehaviour
     private int firstPlayer = 0;
     private int trumpChoser = 0;
     private CardColor trickColor;
-    private CardType[] currentTrick = new CardType[4]; // player one populates currentTrick[0], etc.
+    private CardType[] currentTrick = new CardType[PLAYER_CONT]; // player one populates currentTrick[0], etc.
     private List<CardType> cardsTeamOne, cardsTeamTwo;
-    private CardColor trump;
-
-    private Player[] players = new Player[1];
+    private CardColor trump = CardColor.Spades;
     private GameState gameState = GameState.WaitingForPlayers;
     private float timer;
 
@@ -128,9 +130,12 @@ public class GameManager : NetworkBehaviour
 
     private void HandleTrumpChoice()
     {
-        trump = CardColor.Spades;
+        // simply cycle through all color for now
+        trump = (CardColor)(((int)trump + 1) % Enum.GetValues(typeof(CardColor)).Length);
+
         UpdatePlayerTrump(trump);
         UpdateExtraLines("TRUMP IS " + trump.ToString(), "");
+
         gameState = GameState.OngoingTrick;
     }
 
@@ -176,7 +181,6 @@ public class GameManager : NetworkBehaviour
 
         if (tricksCount == 9)
         {
-            Debug.Log("Match ended");
             trumpChoser = (trumpChoser + 1) % players.Length;
             gameState = GameState.MatchEnded;
         }
@@ -190,6 +194,7 @@ public class GameManager : NetworkBehaviour
 
     private void DealCards()
     {
+        allCards.OrderBy(o => UnityEngine.Random.Range(-1f, 1f));
 
         for (int player = 0; player < players.Length; player++)
         {
