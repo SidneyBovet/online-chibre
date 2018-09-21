@@ -32,6 +32,9 @@ namespace Cards
         public CardRank rank;
     }
 
+    /// <summary>
+    /// Represents a card in Unity. Holds a card's type and state, which is handled using collider components.
+    /// </summary>
     public class Card : MonoBehaviour
     {
         public enum CardState
@@ -54,6 +57,7 @@ namespace Cards
             cardType.color = cardColor;
             cardType.rank = cardRank;
         }
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.name == "DropZone")

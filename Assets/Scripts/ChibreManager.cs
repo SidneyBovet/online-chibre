@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cards;
 
+/// <summary>
+/// A set of helper functions and statefull score tracking for playing chibre.
+/// </summary>
 public class ChibreManager : MonoBehaviour
 {
     /*
@@ -121,6 +124,7 @@ public class ChibreManager : MonoBehaviour
     public void OnMeld(int team, int meldScore)
     {
         Debug.LogFormat("Team {0} scores {1} with a meld.", team, meldScore);
+        throw new System.NotImplementedException();
     }
 
     private int ComputeScore(CardColor trump, CardType[] cards)

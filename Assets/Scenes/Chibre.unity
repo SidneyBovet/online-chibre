@@ -340,8 +340,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTeamOne: 1
-  scoreTeamOne: {fileID: 446923116}
-  scoreTeamTwo: {fileID: 1870547050}
+  scoreUs: {fileID: 446923116}
+  scoreThem: {fileID: 1870547050}
   extraLineOne: {fileID: 1566995645}
   extraLineTwo: {fileID: 670543921}
 --- !u!1001 &159615884
@@ -484,7 +484,6 @@ GameObject:
   m_Component:
   - component: {fileID: 257038741}
   - component: {fileID: 257038742}
-  - component: {fileID: 257038743}
   m_Layer: 0
   m_Name: Player (2)
   m_TagString: Untagged
@@ -516,18 +515,6 @@ MonoBehaviour:
   m_Script: {fileID: -1050975500, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &257038743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 257038740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 220a601f44e425b4794d3757d6985ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerId: 1
 --- !u!1 &265868364
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,7 +785,7 @@ GameObject:
   - component: {fileID: 446923115}
   - component: {fileID: 446923116}
   m_Layer: 0
-  m_Name: Score Team One
+  m_Name: Score Us
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1091,7 +1078,7 @@ GameObject:
   m_Component:
   - component: {fileID: 531084316}
   m_Layer: 0
-  m_Name: Players
+  m_Name: StartPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1616,7 +1603,6 @@ GameObject:
   m_Component:
   - component: {fileID: 771187466}
   - component: {fileID: 771187467}
-  - component: {fileID: 771187468}
   m_Layer: 0
   m_Name: Player (1)
   m_TagString: Untagged
@@ -1648,18 +1634,6 @@ MonoBehaviour:
   m_Script: {fileID: -1050975500, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &771187468
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 771187465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 220a601f44e425b4794d3757d6985ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerId: 0
 --- !u!1 &780565899
 GameObject:
   m_ObjectHideFlags: 0
@@ -1935,7 +1909,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1020151955}
   - component: {fileID: 1020151956}
-  - component: {fileID: 1020151957}
   m_Layer: 0
   m_Name: Player (3)
   m_TagString: Untagged
@@ -1967,18 +1940,6 @@ MonoBehaviour:
   m_Script: {fileID: -1050975500, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1020151957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1020151954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 220a601f44e425b4794d3757d6985ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerId: 2
 --- !u!1 &1076218958
 GameObject:
   m_ObjectHideFlags: 0
@@ -2831,7 +2792,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1822745034}
   - component: {fileID: 1822745035}
-  - component: {fileID: 1822745036}
   m_Layer: 0
   m_Name: Player (4)
   m_TagString: Untagged
@@ -2863,18 +2823,6 @@ MonoBehaviour:
   m_Script: {fileID: -1050975500, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1822745036
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1822745033}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 220a601f44e425b4794d3757d6985ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerId: 3
 --- !u!1 &1870547047
 GameObject:
   m_ObjectHideFlags: 0
@@ -2886,7 +2834,7 @@ GameObject:
   - component: {fileID: 1870547049}
   - component: {fileID: 1870547050}
   m_Layer: 0
-  m_Name: Score Team Two
+  m_Name: Score Them
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -6,8 +6,23 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Cards;
 
+/// <summary>
+/// This behaviour lives on the server only, and uses Target- and ClientRpc calls on the Player objects to
+/// communicate state changes to them. Its core is a finite state machine describing the game state. It also
+/// receives played cards and transmits them to a score-computing script.
+/// 
+/// <seealso cref="Player"/>
+/// <seealso cref="ChibreManager"/>
+/// </summary>
 public class GameManager : NetworkBehaviour
 {
+    /*
+    A note on security: many responsibilities (e.g. checking whether a card may be played based on the cards in hand
+    and those already played) are offloaded on the clients themselves, which is a bad idea in terms of security.
+    Even worse: the cards dealt to each players actually live on each client, meaning that one could modify a client
+    to get full knowledge of each player's hand.
+    But since the idea is to play among friends, we are not fighting against malicious clients.
+    */
     private enum GameState
     {
         WaitingForPlayers,
@@ -26,7 +41,7 @@ public class GameManager : NetworkBehaviour
     private int tricksCount = 0;
     private int cardsDroppedCount = 0;
     private int firstPlayer = 0;
-    private int trumpChoser = 0;
+    private int trumpChooser = 0;
     private CardColor trickColor;
     private CardType[] currentTrick = new CardType[PLAYER_CONT]; // player one populates currentTrick[0], etc.
     private List<CardType> cardsTeamOne, cardsTeamTwo;
@@ -102,7 +117,7 @@ public class GameManager : NetworkBehaviour
                 break;
             case GameState.ChooseTrump:
                 // wait for team to choose trump
-                Debug.Log("Chosing trump");
+                Debug.Log("Choosing trump");
                 HandleTrumpChoice();
                 break;
             case GameState.OngoingTrick:
@@ -182,7 +197,7 @@ public class GameManager : NetworkBehaviour
 
         if (tricksCount == (int)(allCards.Count / (float)PLAYER_CONT))
         {
-            trumpChoser = (trumpChoser + 1) % players.Length;
+            trumpChooser = (trumpChooser + 1) % players.Length;
             gameState = GameState.MatchEnded;
         }
     }
@@ -207,7 +222,7 @@ public class GameManager : NetworkBehaviour
 
                 if (allCards[i].color == CardColor.Diamonds
                     && allCards[i].rank == CardRank.Seven)
-                    trumpChoser = player;
+                    trumpChooser = player;
             }
 
             if (player < players.Length)

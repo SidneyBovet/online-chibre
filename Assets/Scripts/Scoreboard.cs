@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Non-networked object updated by Player at the server's GameManager's request.
+///  Displays current score, as well as two extra lines of text to remind trump color and other things.
+/// </summary>
 public class Scoreboard : MonoBehaviour
 {
-    public static Scoreboard instance;
-    public bool isTeamOne = true;
+    public static Scoreboard instance; // singleton for convenience
+    public bool isTeamOne = true; // defines which scores get printed left and right
     [SerializeField]
-    private TextMesh scoreTeamOne;
+    private TextMesh scoreUs;
     [SerializeField]
-    private TextMesh scoreTeamTwo;
+    private TextMesh scoreThem;
     [SerializeField]
     private TextMesh extraLineOne;
     [SerializeField]
@@ -27,13 +31,13 @@ public class Scoreboard : MonoBehaviour
     {
         if (isTeamOne)
         {
-            scoreTeamOne.text = teamOne.ToString();
-            scoreTeamTwo.text = teamTwo.ToString();
+            scoreUs.text = teamOne.ToString();
+            scoreThem.text = teamTwo.ToString();
         }
         else
         {
-            scoreTeamOne.text = teamTwo.ToString();
-            scoreTeamTwo.text = teamOne.ToString();
+            scoreUs.text = teamTwo.ToString();
+            scoreThem.text = teamOne.ToString();
         }
     }
 

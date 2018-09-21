@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+/// <summary>
+/// A rather simple override of Unity's NetworkManager that makes sure players are seated correctly around the
+/// table and lets them know about their id.
+/// </summary>
 public class ChibreNetworkManager : NetworkManager
 {
     [SerializeField]

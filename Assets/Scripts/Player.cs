@@ -5,24 +5,28 @@ using UnityEngine.Networking;
 using UnityEngine;
 using Cards;
 
+/// <summary>
+/// This class represents a player, and is part of the prefab spawned every time a client connects to the server.
+/// It lets users handle cards, and tells the server about which card was played, etc. 
+/// </summary>
 public class Player : NetworkBehaviour
 {
     [SerializeField] private GameObject cardBackPrefab;
 
     public int playerId = -1;
 
-    private GameManager gameManager;
+    private GameManager gameManager; // discovered on awake, not null only on server-side instances
     private Card[] cards;
-    public List<CardType> hand = new List<CardType>();
-    private bool canPlay = false;
-    private CardType[] currentTrick;
-    private CardColor trump;
-    private CardColor? trickColor = null;
+    public List<CardType> hand = new List<CardType>(); // received from server
+    private bool canPlay = false; // received from server
+    private CardType[] currentTrick; // received from server
+    private CardColor trump; // received from server
+    private CardColor? trickColor = null; // received from server, is null on trick start
     private Card movingCard;
     private Camera cam;
 
-    private Vector3 cardPickupTranslation = new Vector3(0f, 0.01f, 0f);
-    private Vector3 cardDropTranslation = new Vector3(0f, 0.03f, 0f);
+    private Vector3 cardPickupTranslation = new Vector3(0f, 0.01f, 0f); // from hand to air
+    private Vector3 cardDropTranslation = new Vector3(0f, 0.03f, 0f); // from air to table
 
     [TargetRpc]
     public void TargetSetPlayerId(NetworkConnection target, int id)
