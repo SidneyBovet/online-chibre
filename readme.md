@@ -6,4 +6,4 @@ This Unity application lets you and your friends play Jass over the internet!
 
 ## Contributing
 
-Don't hesitate to contribute. There is no defined code style, but whatever is in the files is kind of authoritative in terms of style.
+Ongoing work is happening on the `develop` branch. The Unity version used for this project is Unity 2018.2.1f1. There is no defined code style, but whatever is in the files is kind of authoritative in terms of style.
